@@ -1,0 +1,44 @@
+{
+  "name": "@comm-scope/core",
+  "version": "0.1.0",
+  "description": "Engine for comm-scope: transport capture, recording, replay and analysis",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "serial",
+    "tcp",
+    "udp",
+    "traffic",
+    "replay",
+    "transport"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AndyFree96/comm-scope"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "serialport": "^13.0.0"
+  }
+}

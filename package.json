@@ -1,0 +1,26 @@
+{
+  "name": "comm-scope-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Monorepo for comm-scope — Serial / TCP / UDP traffic monitor for developers",
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w @comm-scope/core && npm run build -w comm-scope",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "dev": "tsx packages/cli/src/index.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "publish:core": "npm run build -w @comm-scope/core && npm publish -w @comm-scope/core",
+    "publish:cli": "npm run build -w comm-scope && npm publish -w comm-scope"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "tsup": "^8.3.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^3.0.0"
+  }
+}
