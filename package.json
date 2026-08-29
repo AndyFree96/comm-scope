@@ -8,12 +8,12 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build -w @comm-scope/core && npm run build -w comm-scope",
+    "build": "npm run build -w @anthonyfree96/core && npm run build -w comm-scope",
     "test": "vitest run",
     "test:watch": "vitest",
     "dev": "tsx packages/cli/src/index.ts",
-    "typecheck": "tsc --noEmit -p tsconfig.json",
-    "publish:core": "npm run build -w @comm-scope/core && npm publish -w @comm-scope/core",
+    "typecheck": "npm run build -w @anthonyfree96/core && npm run typecheck -w @anthonyfree96/core && npm run typecheck -w comm-scope",
+    "publish:core": "npm run build -w @anthonyfree96/core && npm publish -w @anthonyfree96/core",
     "publish:cli": "npm run build -w comm-scope && npm publish -w comm-scope"
   },
   "devDependencies": {

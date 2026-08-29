@@ -20,22 +20,29 @@ $ comm-scope monitor tcp-listen:9000
 
 ## 目录
 
-- [为什么需要 comm-scope](#为什么需要-comm-scope)
-- [特性](#特性)
-- [安装](#安装)
-- [快速上手](#快速上手)
-- [使用](#使用)
-  - [传输描述符](#传输描述符)
-  - [命令概览](#命令概览)
-  - [选项参考](#选项参考)
-- [示例](#示例)
-- [与其他工具对比](#与其他工具对比)
-- [录制格式](#录制格式)
-- [架构](#架构)
-- [开发](#开发)
-- [路线图与限制](#路线图与限制)
-- [常见问题](#常见问题)
-- [许可证](#许可证)
+- [comm-scope](#comm-scope)
+  - [目录](#目录)
+  - [为什么需要 comm-scope](#为什么需要-comm-scope)
+  - [特性](#特性)
+  - [安装](#安装)
+    - [通过 npm（推荐）](#通过-npm推荐)
+    - [从源码安装](#从源码安装)
+  - [快速上手](#快速上手)
+  - [使用](#使用)
+    - [传输描述符](#传输描述符)
+    - [命令概览](#命令概览)
+    - [选项参考](#选项参考)
+  - [示例](#示例)
+  - [与其他工具对比](#与其他工具对比)
+  - [录制格式](#录制格式)
+  - [架构](#架构)
+  - [开发](#开发)
+    - [目录结构](#目录结构)
+    - [添加一种传输](#添加一种传输)
+    - [约定](#约定)
+  - [路线图与限制](#路线图与限制)
+  - [常见问题](#常见问题)
+  - [许可证](#许可证)
 
 ## 为什么需要 comm-scope
 
@@ -73,7 +80,7 @@ comm-scope --help
 ### 从源码安装
 
 ```bash
-git clone https://github.com/<you>/comm-scope
+git clone https://github.com/AndyFree96/comm-scope
 cd comm-scope
 npm install        # 安装 workspace 依赖（含 serialport 原生二进制）
 npm run build      # 构建 core + cli
@@ -124,26 +131,26 @@ comm-scope monitor serial:COM3 --tui                        # 5. 交互式实时
 
 `monitor` 和 `record` 用一个 spec 字符串描述传输，`replay --to` 亦复用：
 
-| 形式 | 含义 |
-|---|---|
+| 形式                 | 含义                                               |
+| -------------------- | -------------------------------------------------- |
 | `serial:PORT[:BAUD]` | 串口，如 `serial:COM3:115200`（波特率默认 115200） |
-| `tcp:HOST:PORT` | 作为客户端连接远端 |
-| `tcp-listen:PORT` | 监听端口，接受多个客户端 |
-| `udp:HOST:PORT` | 发往指定对端（并接收其回包） |
-| `udp-listen:PORT` | 绑定本地端口，接收任意来源 |
+| `tcp:HOST:PORT`      | 作为客户端连接远端                                 |
+| `tcp-listen:PORT`    | 监听端口，接受多个客户端                           |
+| `udp:HOST:PORT`      | 发往指定对端（并接收其回包）                       |
+| `udp-listen:PORT`    | 绑定本地端口，接收任意来源                         |
 
 监听类也可绑定指定地址：`tcp-listen:127.0.0.1:9000`、`udp-listen:0.0.0.0:9999`。支持方括号 IPv6：`tcp:[::1]:9000`。
 
 ### 命令概览
 
-| 命令 | 用途 |
-|---|---|
-| `monitor <spec>` | 实时监控（流式或 `--tui`） |
-| `record <spec> --out <file>` | 无头采集 |
-| `view <file>` | 按原始时序离线回放 |
-| `search <file>` | 带上下文检索录制 |
-| `replay <file> --to <spec>` | 把录制字节重发到目标 |
-| `list-serial` | 枚举串口 |
+| 命令                         | 用途                       |
+| ---------------------------- | -------------------------- |
+| `monitor <spec>`             | 实时监控（流式或 `--tui`） |
+| `record <spec> --out <file>` | 无头采集                   |
+| `view <file>`                | 按原始时序离线回放         |
+| `search <file>`              | 带上下文检索录制           |
+| `replay <file> --to <spec>`  | 把录制字节重发到目标       |
+| `list-serial`                | 枚举串口                   |
 
 所有命令都支持 `--help` 查看完整选项。
 
@@ -151,56 +158,56 @@ comm-scope monitor serial:COM3 --tui                        # 5. 交互式实时
 
 **`monitor`**
 
-| 选项 | 说明 |
-|---|---|
-| `--format <hex\|ascii\|raw>` | 输出格式（默认 `hex`） |
-| `--no-timestamp` | 省略时间戳 |
-| `--no-color` | 关闭 ANSI 颜色 |
-| `--string <s>` | 仅显示含该 UTF-8 子串的事件 |
-| `--hex <h>` | 仅显示含该 hex 字节序列的事件 |
-| `--regex <re>` | 仅显示 UTF-8 文本匹配该正则的事件 |
-| `--dir <rx\|tx>` | 仅显示某一方向 |
-| `--record <file>` | 监控的同时录制 |
-| `--stats` | 退出时输出字节/包数/速率统计 |
-| `--timeout <s>` | N 秒后自动停止 |
-| `--tui` | 交互式面板（`q` 退出） |
+| 选项                         | 说明                              |
+| ---------------------------- | --------------------------------- |
+| `--format <hex\|ascii\|raw>` | 输出格式（默认 `hex`）            |
+| `--no-timestamp`             | 省略时间戳                        |
+| `--no-color`                 | 关闭 ANSI 颜色                    |
+| `--string <s>`               | 仅显示含该 UTF-8 子串的事件       |
+| `--hex <h>`                  | 仅显示含该 hex 字节序列的事件     |
+| `--regex <re>`               | 仅显示 UTF-8 文本匹配该正则的事件 |
+| `--dir <rx\|tx>`             | 仅显示某一方向                    |
+| `--record <file>`            | 监控的同时录制                    |
+| `--stats`                    | 退出时输出字节/包数/速率统计      |
+| `--timeout <s>`              | N 秒后自动停止                    |
+| `--tui`                      | 交互式面板（`q` 退出）            |
 
 **`record`**
 
-| 选项 | 说明 |
-|---|---|
-| `--out <file>` | 输出文件（必填） |
+| 选项                                          | 说明             |
+| --------------------------------------------- | ---------------- |
+| `--out <file>`                                | 输出文件（必填） |
 | `--string <s>` / `--hex <h>` / `--regex <re>` | 过滤要录制的内容 |
-| `--dir <rx\|tx>` | 仅录制某一方向 |
-| `--stats` | 退出时输出统计 |
+| `--dir <rx\|tx>`                              | 仅录制某一方向   |
+| `--stats`                                     | 退出时输出统计   |
 
 **`view`**
 
-| 选项 | 说明 |
-|---|---|
-| `--speed <n>` | 回放速度倍率（默认 `1`，`0` = 最快） |
-| `--format <hex\|ascii\|raw>` | 输出格式 |
-| `--no-timestamp` / `--no-color` | 输出控制 |
-| `--dir <rx\|tx>` | 仅显示某一方向 |
-| `--tui` | 交互式面板 |
+| 选项                            | 说明                                 |
+| ------------------------------- | ------------------------------------ |
+| `--speed <n>`                   | 回放速度倍率（默认 `1`，`0` = 最快） |
+| `--format <hex\|ascii\|raw>`    | 输出格式                             |
+| `--no-timestamp` / `--no-color` | 输出控制                             |
+| `--dir <rx\|tx>`                | 仅显示某一方向                       |
+| `--tui`                         | 交互式面板                           |
 
 **`search`**
 
-| 选项 | 说明 |
-|---|---|
-| `--string <s>` / `--hex <h>` / `--regex <re>` | 匹配条件（至少一个） |
-| `--dir <rx\|tx>` | 限定某一方向 |
-| `-C, --context <n>` | 命中前后的上下文事件数（默认 `2`） |
-| `--no-timestamp` / `--no-color` | 输出控制 |
+| 选项                                          | 说明                               |
+| --------------------------------------------- | ---------------------------------- |
+| `--string <s>` / `--hex <h>` / `--regex <re>` | 匹配条件（至少一个）               |
+| `--dir <rx\|tx>`                              | 限定某一方向                       |
+| `-C, --context <n>`                           | 命中前后的上下文事件数（默认 `2`） |
+| `--no-timestamp` / `--no-color`               | 输出控制                           |
 
 **`replay`**
 
-| 选项 | 说明 |
-|---|---|
-| `--to <spec>` | 目标传输（必填） |
-| `--speed <n>` | 回放速度倍率（默认 `1`，`0` = 最快） |
+| 选项             | 说明                                   |
+| ---------------- | -------------------------------------- |
+| `--to <spec>`    | 目标传输（必填）                       |
+| `--speed <n>`    | 回放速度倍率（默认 `1`，`0` = 最快）   |
 | `--dir <rx\|tx>` | 仅重放某一方向（默认：全部、按时间序） |
-| `--loop` | 持续循环重发，直到 `Ctrl-C` |
+| `--loop`         | 持续循环重发，直到 `Ctrl-C`            |
 
 ## 示例
 
@@ -239,13 +246,13 @@ comm-scope replay issue.jsonl --to serial:COM3 --loop
 
 ## 与其他工具对比
 
-| 工具 | 擅长 | comm-scope 的差异 |
-|---|---|---|
-| `socat` | 通用端点转发 | comm-scope 是*观察*流量（带时间戳与方向），而非转发；并增加录制/回放/搜索 |
-| `tio` / `picocom` / `minicom` | 交互式串口终端 | 它们是带行编辑的终端；comm-scope 是被动监控，输出 hex+ASCII、时间戳与采集 |
-| `tcpdump` / `ngrep` | 包级网络抓包 | 基于 pcap、面向数据包；comm-scope 面向字节*流*（Serial + TCP + UDP），无需 libpcap、无需 root |
-| `Wireshark` / `termshark` | 深度协议分析 | 协议解析器与 GUI；comm-scope 是轻量、可脚本化的 CLI，聚焦采集→回放闭环 |
-| `candump` / `slcan-utils` | CAN 总线 | comm-scope 不针对 CAN |
+| 工具                          | 擅长           | comm-scope 的差异                                                                             |
+| ----------------------------- | -------------- | --------------------------------------------------------------------------------------------- |
+| `socat`                       | 通用端点转发   | comm-scope 是*观察*流量（带时间戳与方向），而非转发；并增加录制/回放/搜索                     |
+| `tio` / `picocom` / `minicom` | 交互式串口终端 | 它们是带行编辑的终端；comm-scope 是被动监控，输出 hex+ASCII、时间戳与采集                     |
+| `tcpdump` / `ngrep`           | 包级网络抓包   | 基于 pcap、面向数据包；comm-scope 面向字节*流*（Serial + TCP + UDP），无需 libpcap、无需 root |
+| `Wireshark` / `termshark`     | 深度协议分析   | 协议解析器与 GUI；comm-scope 是轻量、可脚本化的 CLI，聚焦采集→回放闭环                        |
+| `candump` / `slcan-utils`     | CAN 总线       | comm-scope 不针对 CAN                                                                         |
 
 comm-scope 不是包解析器的替代品，而是「线上的示波器」—— 一个字节级、带方向的监控器，配有完整的采集/回放工作流。
 
@@ -260,34 +267,34 @@ JSON Lines：首行是 header，之后每行一个事件。payload 为小写 hex
 
 **Header 字段**
 
-| 字段 | 含义 |
-|---|---|
-| `comm-scope` | 魔法键 + schema 版本 |
-| `kind` | 传输类型 |
-| `id` / `desc` | 传输标识 / 规范 spec |
-| `started` | 会话开始时间（epoch ms） |
+| 字段          | 含义                     |
+| ------------- | ------------------------ |
+| `comm-scope`  | 魔法键 + schema 版本     |
+| `kind`        | 传输类型                 |
+| `id` / `desc` | 传输标识 / 规范 spec     |
+| `started`     | 会话开始时间（epoch ms） |
 
 **事件字段**
 
-| 字段 | 含义 |
-|---|---|
-| `t` | 事件时间（epoch ms） |
-| `dir` | `rx` 或 `tx` |
-| `kind` / `id` / `desc` | 传输元数据（监听类为对端） |
-| `enc` | payload 编码（当前为 `hex`） |
-| `data` | hex 编码的 payload |
+| 字段                   | 含义                         |
+| ---------------------- | ---------------------------- |
+| `t`                    | 事件时间（epoch ms）         |
+| `dir`                  | `rx` 或 `tx`                 |
+| `kind` / `id` / `desc` | 传输元数据（监听类为对端）   |
+| `enc`                  | payload 编码（当前为 `hex`） |
+| `data`                 | hex 编码的 payload           |
 
 ## 架构
 
 npm workspace，两层：
 
-- **`packages/core`**（`@comm-scope/core`）—— 无任何展示依赖的引擎：
+- **`packages/core`**（`@anthonyfree96/core`）—— 无任何展示依赖的引擎：
   - `transport/`：Serial/TCP/UDP 传输抽象（`Transport` 接口 + spec 解析）
   - `source/`：`DataSource` 接口（实时传输与 `FileSource` 回放共用）
   - `sink/`：渲染、录制、统计、过滤都是 `Sink`，可任意组合
   - `replay/`：时序引擎 + 线上重发
   - `format/`：hexdump、JSONL 编解码
-- **`packages/cli`**（`@comm-scope/cli`）—— commander 前端 + 流式渲染器 + neo-blessed TUI
+- **`packages/cli`**（`comm-scope`）—— commander 前端 + 流式渲染器 + neo-blessed TUI
 
 ```
 DataSource ── TrafficEvent ──► [filter] ──► [Sink: stream renderer]
@@ -298,7 +305,7 @@ DataSource ── TrafficEvent ──► [filter] ──► [Sink: stream render
 
 实时传输与录制文件实现同一个 `DataSource`，因此 `view` 与 `monitor` 行为完全一致。
 
-**GUI 扩展路径**：GUI 只需依赖 `@comm-scope/core`，用同一个 `DataSource`/`Sink` 接口实现新的 `Sink`（Electron/Tauri 表格视图），录制格式、回放时序、传输抽象全部复用，无需改动 core。
+**GUI 扩展路径**：GUI 只需依赖 `@anthonyfree96/core`，用同一个 `DataSource`/`Sink` 接口实现新的 `Sink`（Electron/Tauri 表格视图），录制格式、回放时序、传输抽象全部复用，无需改动 core。
 
 ## 开发
 
@@ -352,7 +359,7 @@ packages/cli/src/
 - 流重组 / 跨事件模式匹配
 - 面板内搜索与过滤
 - 更多录制编码（base64、原始二进制）与 pcap 导出
-- 基于 `@comm-scope/core` 的 GUI 前端（Electron/Tauri）
+- 基于 `@anthonyfree96/core` 的 GUI 前端（Electron/Tauri）
 
 ## 常见问题
 

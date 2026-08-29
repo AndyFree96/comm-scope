@@ -20,29 +20,36 @@ $ comm-scope monitor tcp-listen:9000
 
 ## Table of contents
 
-- [Why comm-scope](#why-comm-scope)
-- [Features](#features)
-- [Installation](#installation)
-- [Quick start](#quick-start)
-- [Usage](#usage)
-  - [Transport spec](#transport-spec)
-  - [Command overview](#command-overview)
-  - [Option reference](#option-reference)
-- [Examples](#examples)
-- [Comparison with other tools](#comparison-with-other-tools)
-- [Recording format](#recording-format)
-- [Architecture](#architecture)
-- [Development](#development)
-- [Roadmap & limitations](#roadmap--limitations)
-- [Troubleshooting](#troubleshooting)
-- [License](#license)
+- [comm-scope](#comm-scope)
+  - [Table of contents](#table-of-contents)
+  - [Why comm-scope](#why-comm-scope)
+  - [Features](#features)
+  - [Installation](#installation)
+    - [From npm (recommended)](#from-npm-recommended)
+    - [From source](#from-source)
+  - [Quick start](#quick-start)
+  - [Usage](#usage)
+    - [Transport spec](#transport-spec)
+    - [Command overview](#command-overview)
+    - [Option reference](#option-reference)
+  - [Examples](#examples)
+  - [Comparison with other tools](#comparison-with-other-tools)
+  - [Recording format](#recording-format)
+  - [Architecture](#architecture)
+  - [Development](#development)
+    - [Project layout](#project-layout)
+    - [Adding a transport](#adding-a-transport)
+    - [Conventions](#conventions)
+  - [Roadmap \& limitations](#roadmap--limitations)
+  - [Troubleshooting](#troubleshooting)
+  - [License](#license)
 
 ## Why comm-scope
 
-Debugging a device on a serial port or a service on a socket usually means reaching for a grab-bag of single-purpose tools (`socat`, `tio`, `nc`, `tcpdump`, …), none of which covers the full loop of *observe → capture → search → reproduce*. comm-scope brings that loop into one tool with a single spec syntax:
+Debugging a device on a serial port or a service on a socket usually means reaching for a grab-bag of single-purpose tools (`socat`, `tio`, `nc`, `tcpdump`, …), none of which covers the full loop of _observe → capture → search → reproduce_. comm-scope brings that loop into one tool with a single spec syntax:
 
 - One command line for Serial, TCP and UDP — `serial:COM3:115200`, `tcp-listen:9000`, `udp-listen:9999`.
-- Direction-aware (`rx`/`tx`) with timestamps, so you can see *who said what when*.
+- Direction-aware (`rx`/`tx`) with timestamps, so you can see _who said what when_.
 - A full round-trip: `record` → `view` → `search` → `replay` on the exact same byte stream.
 - Human-readable, greppable recordings (JSON Lines) instead of opaque pcap/binary dumps.
 - A presentation-free core, so a GUI (Electron/Tauri) can be added later without touching the engine.
@@ -73,7 +80,7 @@ comm-scope --help
 ### From source
 
 ```bash
-git clone https://github.com/<you>/comm-scope
+git clone https://github.com/AndyFree96/comm-scope
 cd comm-scope
 npm install        # installs workspaces (incl. the serialport native binding)
 npm run build      # builds core + cli
@@ -124,26 +131,26 @@ comm-scope monitor serial:COM3 --tui                        # 5. watch live, int
 
 `monitor` and `record` take a single spec string; `replay --to` reuses it:
 
-| Spec | Meaning |
-|---|---|
+| Spec                 | Meaning                                                          |
+| -------------------- | ---------------------------------------------------------------- |
 | `serial:PORT[:BAUD]` | Serial port, e.g. `serial:COM3:115200` (baud defaults to 115200) |
-| `tcp:HOST:PORT` | Connect out as a client |
-| `tcp-listen:PORT` | Listen and accept multiple clients |
-| `udp:HOST:PORT` | Send to a peer (and receive its replies) |
-| `udp-listen:PORT` | Bind locally and receive from anyone |
+| `tcp:HOST:PORT`      | Connect out as a client                                          |
+| `tcp-listen:PORT`    | Listen and accept multiple clients                               |
+| `udp:HOST:PORT`      | Send to a peer (and receive its replies)                         |
+| `udp-listen:PORT`    | Bind locally and receive from anyone                             |
 
 Listeners may also bind a specific address: `tcp-listen:127.0.0.1:9000`, `udp-listen:0.0.0.0:9999`. Bracketed IPv6 works: `tcp:[::1]:9000`.
 
 ### Command overview
 
-| Command | Purpose |
-|---|---|
-| `monitor <spec>` | Live monitoring (stream or `--tui`) |
-| `record <spec> --out <file>` | Headless capture |
-| `view <file>` | Offline playback at original timing |
-| `search <file>` | Search a recording with context |
-| `replay <file> --to <spec>` | Re-send recorded bytes to a target |
-| `list-serial` | Enumerate serial ports |
+| Command                      | Purpose                             |
+| ---------------------------- | ----------------------------------- |
+| `monitor <spec>`             | Live monitoring (stream or `--tui`) |
+| `record <spec> --out <file>` | Headless capture                    |
+| `view <file>`                | Offline playback at original timing |
+| `search <file>`              | Search a recording with context     |
+| `replay <file> --to <spec>`  | Re-send recorded bytes to a target  |
+| `list-serial`                | Enumerate serial ports              |
 
 All commands support `--help` for their full option list.
 
@@ -151,56 +158,56 @@ All commands support `--help` for their full option list.
 
 **`monitor`**
 
-| Option | Description |
-|---|---|
-| `--format <hex\|ascii\|raw>` | Output format (default `hex`) |
-| `--no-timestamp` | Omit timestamps |
-| `--no-color` | Disable ANSI colors |
-| `--string <s>` | Only show events containing this UTF-8 substring |
-| `--hex <h>` | Only show events containing this hex byte sequence |
-| `--regex <re>` | Only show events whose UTF-8 text matches this regex |
-| `--dir <rx\|tx>` | Only show one direction |
-| `--record <file>` | Also record traffic while monitoring |
-| `--stats` | Print byte/packet/rate statistics on exit |
-| `--timeout <s>` | Auto-stop after N seconds |
-| `--tui` | Interactive dashboard (`q` to quit) |
+| Option                       | Description                                          |
+| ---------------------------- | ---------------------------------------------------- |
+| `--format <hex\|ascii\|raw>` | Output format (default `hex`)                        |
+| `--no-timestamp`             | Omit timestamps                                      |
+| `--no-color`                 | Disable ANSI colors                                  |
+| `--string <s>`               | Only show events containing this UTF-8 substring     |
+| `--hex <h>`                  | Only show events containing this hex byte sequence   |
+| `--regex <re>`               | Only show events whose UTF-8 text matches this regex |
+| `--dir <rx\|tx>`             | Only show one direction                              |
+| `--record <file>`            | Also record traffic while monitoring                 |
+| `--stats`                    | Print byte/packet/rate statistics on exit            |
+| `--timeout <s>`              | Auto-stop after N seconds                            |
+| `--tui`                      | Interactive dashboard (`q` to quit)                  |
 
 **`record`**
 
-| Option | Description |
-|---|---|
-| `--out <file>` | Output file (required) |
+| Option                                        | Description               |
+| --------------------------------------------- | ------------------------- |
+| `--out <file>`                                | Output file (required)    |
 | `--string <s>` / `--hex <h>` / `--regex <re>` | Filter what gets recorded |
-| `--dir <rx\|tx>` | Only record one direction |
-| `--stats` | Print statistics on exit |
+| `--dir <rx\|tx>`                              | Only record one direction |
+| `--stats`                                     | Print statistics on exit  |
 
 **`view`**
 
-| Option | Description |
-|---|---|
-| `--speed <n>` | Replay speed multiplier (default `1`, `0` = as fast as possible) |
-| `--format <hex\|ascii\|raw>` | Output format |
-| `--no-timestamp` / `--no-color` | Output controls |
-| `--dir <rx\|tx>` | Only show one direction |
-| `--tui` | Interactive dashboard |
+| Option                          | Description                                                      |
+| ------------------------------- | ---------------------------------------------------------------- |
+| `--speed <n>`                   | Replay speed multiplier (default `1`, `0` = as fast as possible) |
+| `--format <hex\|ascii\|raw>`    | Output format                                                    |
+| `--no-timestamp` / `--no-color` | Output controls                                                  |
+| `--dir <rx\|tx>`                | Only show one direction                                          |
+| `--tui`                         | Interactive dashboard                                            |
 
 **`search`**
 
-| Option | Description |
-|---|---|
-| `--string <s>` / `--hex <h>` / `--regex <re>` | Match criteria (at least one required) |
-| `--dir <rx\|tx>` | Restrict to one direction |
-| `-C, --context <n>` | Context events around each match (default `2`) |
-| `--no-timestamp` / `--no-color` | Output controls |
+| Option                                        | Description                                    |
+| --------------------------------------------- | ---------------------------------------------- |
+| `--string <s>` / `--hex <h>` / `--regex <re>` | Match criteria (at least one required)         |
+| `--dir <rx\|tx>`                              | Restrict to one direction                      |
+| `-C, --context <n>`                           | Context events around each match (default `2`) |
+| `--no-timestamp` / `--no-color`               | Output controls                                |
 
 **`replay`**
 
-| Option | Description |
-|---|---|
-| `--to <spec>` | Target transport (required) |
-| `--speed <n>` | Replay speed multiplier (default `1`, `0` = max) |
+| Option           | Description                                             |
+| ---------------- | ------------------------------------------------------- |
+| `--to <spec>`    | Target transport (required)                             |
+| `--speed <n>`    | Replay speed multiplier (default `1`, `0` = max)        |
 | `--dir <rx\|tx>` | Only replay one direction (default: all, chronological) |
-| `--loop` | Re-send continuously until `Ctrl-C` |
+| `--loop`         | Re-send continuously until `Ctrl-C`                     |
 
 ## Examples
 
@@ -239,13 +246,13 @@ comm-scope replay issue.jsonl --to serial:COM3 --loop
 
 ## Comparison with other tools
 
-| Tool | Best at | How comm-scope differs |
-|---|---|---|
-| `socat` | Generic endpoint relaying | comm-scope *observes* traffic (timestamps + direction) rather than relaying it; adds record/replay/search |
-| `tio` / `picocom` / `minicom` | Interactive serial terminals | These are terminals with line editing; comm-scope is a passive monitor with hex+ASCII, timestamps and capture |
-| `tcpdump` / `ngrep` | Packet-level network capture | pcap-based, packet-oriented; comm-scope works on byte *streams* (Serial + TCP + UDP), no libpcap, no root needed |
-| `Wireshark` / `termshark` | Deep protocol analysis | Protocol dissectors and GUIs; comm-scope is a lightweight, scriptable CLI focused on capture → replay round-trips |
-| `candump` / `slcan-utils` | CAN bus | comm-scope does not target CAN |
+| Tool                          | Best at                      | How comm-scope differs                                                                                            |
+| ----------------------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `socat`                       | Generic endpoint relaying    | comm-scope _observes_ traffic (timestamps + direction) rather than relaying it; adds record/replay/search         |
+| `tio` / `picocom` / `minicom` | Interactive serial terminals | These are terminals with line editing; comm-scope is a passive monitor with hex+ASCII, timestamps and capture     |
+| `tcpdump` / `ngrep`           | Packet-level network capture | pcap-based, packet-oriented; comm-scope works on byte _streams_ (Serial + TCP + UDP), no libpcap, no root needed  |
+| `Wireshark` / `termshark`     | Deep protocol analysis       | Protocol dissectors and GUIs; comm-scope is a lightweight, scriptable CLI focused on capture → replay round-trips |
+| `candump` / `slcan-utils`     | CAN bus                      | comm-scope does not target CAN                                                                                    |
 
 comm-scope is not a substitute for packet dissectors; it is the "scope on the wire" — a byte-level, direction-aware monitor with a complete capture/replay workflow.
 
@@ -260,34 +267,34 @@ JSON Lines: the first line is a header, each following line is one event. Payloa
 
 **Header fields**
 
-| Field | Meaning |
-|---|---|
-| `comm-scope` | Magic key + schema version |
-| `kind` | Transport kind |
+| Field         | Meaning                             |
+| ------------- | ----------------------------------- |
+| `comm-scope`  | Magic key + schema version          |
+| `kind`        | Transport kind                      |
 | `id` / `desc` | Transport identity / canonical spec |
-| `started` | Session start (epoch ms) |
+| `started`     | Session start (epoch ms)            |
 
 **Event fields**
 
-| Field | Meaning |
-|---|---|
-| `t` | Event time (epoch ms) |
-| `dir` | `rx` or `tx` |
+| Field                  | Meaning                                     |
+| ---------------------- | ------------------------------------------- |
+| `t`                    | Event time (epoch ms)                       |
+| `dir`                  | `rx` or `tx`                                |
 | `kind` / `id` / `desc` | Transport metadata (per-peer for listeners) |
-| `enc` | Payload encoding (currently `hex`) |
-| `data` | Hex-encoded payload |
+| `enc`                  | Payload encoding (currently `hex`)          |
+| `data`                 | Hex-encoded payload                         |
 
 ## Architecture
 
 An npm workspace with two packages:
 
-- **`packages/core`** (`@comm-scope/core`) — presentation-free engine:
+- **`packages/core`** (`@anthonyfree96/core`) — presentation-free engine:
   - `transport/` — Serial/TCP/UDP transports (`Transport` interface + spec parsing)
   - `source/` — `DataSource` interface, shared by live transports and `FileSource` (offline playback)
   - `sink/` — renderer, recorder, analyzer, filter are all `Sink`s, freely composable
   - `replay/` — timing engine + online re-send
   - `format/` — hexdump and JSONL encode/decode
-- **`packages/cli`** (`@comm-scope/cli`) — commander frontend, streaming renderer, neo-blessed TUI
+- **`packages/cli`** (`comm-scope`) — commander frontend, streaming renderer, neo-blessed TUI
 
 ```
 DataSource ── TrafficEvent ──► [filter] ──► [Sink: stream renderer]
@@ -298,7 +305,7 @@ DataSource ── TrafficEvent ──► [filter] ──► [Sink: stream render
 
 Because live transports and recordings implement the same `DataSource`, `view` behaves identically to `monitor`.
 
-**GUI path:** a GUI only needs to depend on `@comm-scope/core` and implement a new `Sink` (e.g. an Electron/Tauri table view). The recording format, replay timing and transport abstractions are all reused unchanged.
+**GUI path:** a GUI only needs to depend on `@anthonyfree96/core` and implement a new `Sink` (e.g. an Electron/Tauri table view). The recording format, replay timing and transport abstractions are all reused unchanged.
 
 ## Development
 
@@ -352,7 +359,7 @@ packages/cli/src/
 - Stream reassembly / cross-event pattern matching
 - In-TUI search and filtering
 - More recording codecs (base64, raw binary) and pcap export
-- A GUI frontend (Electron/Tauri) built on `@comm-scope/core`
+- A GUI frontend (Electron/Tauri) built on `@anthonyfree96/core`
 
 ## Troubleshooting
 

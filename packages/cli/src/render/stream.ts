@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import type { Sink, TrafficEvent } from '@comm-scope/core';
+import type { Sink, TrafficEvent } from '@anthonyfree96/core';
 import { formatEventLine } from './line.js';
 import type { LineOptions, StreamMode } from './line.js';
 

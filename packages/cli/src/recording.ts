@@ -1,6 +1,6 @@
 import fs from 'node:fs';
-import { JsonlRecorder, toDesc, SCHEMA_VERSION } from '@comm-scope/core';
-import type { TransportSpec } from '@comm-scope/core';
+import { JsonlRecorder, toDesc, SCHEMA_VERSION } from '@anthonyfree96/core';
+import type { TransportSpec } from '@anthonyfree96/core';
 
 /** Build a recorder wired to `outFile`, with a header derived from the spec. */
 export function makeRecorder(spec: TransportSpec, outFile: string): JsonlRecorder {

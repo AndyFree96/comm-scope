@@ -1,4 +1,4 @@
-import type { TrafficSummary } from '@comm-scope/core';
+import type { TrafficSummary } from '@anthonyfree96/core';
 
 /** Plain-text summary of a captured session. */
 export function formatSummary(s: TrafficSummary): string {

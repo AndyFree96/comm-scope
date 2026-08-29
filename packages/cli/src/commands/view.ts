@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import type { Command } from 'commander';
-import { FileSource, Session } from '@comm-scope/core';
-import type { Direction, Sink } from '@comm-scope/core';
+import { FileSource, Session } from '@anthonyfree96/core';
+import type { Direction, Sink } from '@anthonyfree96/core';
 import { StreamRenderer } from '../render/stream.js';
 import { TuiRenderer } from '../render/tui.js';
 import { flushStdio } from '../stdio.js';

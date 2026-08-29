@@ -8,5 +8,5 @@ export default defineConfig({
   clean: true,
   target: 'node20',
   banner: { js: '#!/usr/bin/env node' },
-  external: ['@comm-scope/core', 'serialport', 'neo-blessed'],
+  external: ['@anthonyfree96/core', 'serialport', 'neo-blessed'],
 });

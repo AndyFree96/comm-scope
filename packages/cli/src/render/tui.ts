@@ -1,7 +1,7 @@
 import blessed from 'neo-blessed';
 import type { BlessedScreen, BlessedWidget } from 'neo-blessed';
-import { toHex } from '@comm-scope/core';
-import type { Sink, TrafficEvent } from '@comm-scope/core';
+import { toHex } from '@anthonyfree96/core';
+import type { Sink, TrafficEvent } from '@anthonyfree96/core';
 import { fmtTime, fmtAscii } from './line.js';
 
 export interface TuiOptions {

@@ -1,6 +1,6 @@
 import chalk from 'chalk';
-import { toHex } from '@comm-scope/core';
-import type { TrafficEvent } from '@comm-scope/core';
+import { toHex } from '@anthonyfree96/core';
+import type { TrafficEvent } from '@anthonyfree96/core';
 
 export type StreamMode = 'hex' | 'ascii' | 'raw';
 

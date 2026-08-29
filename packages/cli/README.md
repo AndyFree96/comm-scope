@@ -21,4 +21,4 @@ comm-scope list-serial
 
 ## Full documentation
 
-See the [project README](https://github.com/<you>/comm-scope) for the complete option reference, transport spec syntax, examples, recording format and architecture.
+See the [project README](https://github.com/AndyFree96/comm-scope) for the complete option reference, transport spec syntax, examples, recording format and architecture.

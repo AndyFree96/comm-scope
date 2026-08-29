@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import type { Command } from 'commander';
-import { parseSpec, createTransport, Session, Analyzer } from '@comm-scope/core';
-import type { Direction, Sink } from '@comm-scope/core';
+import { parseSpec, createTransport, Session, Analyzer } from '@anthonyfree96/core';
+import type { Direction, Sink } from '@anthonyfree96/core';
 import { buildMatcher } from '../args.js';
 import { makeRecorder } from '../recording.js';
 import { formatSummary } from '../render/stats.js';

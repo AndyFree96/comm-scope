@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import type { Command } from 'commander';
-import { parseSpec, createTransport, Session, Analyzer, toDesc } from '@comm-scope/core';
-import type { Direction, Sink } from '@comm-scope/core';
+import { parseSpec, createTransport, Session, Analyzer, toDesc } from '@anthonyfree96/core';
+import type { Direction, Sink } from '@anthonyfree96/core';
 import { StreamRenderer } from '../render/stream.js';
 import { TuiRenderer } from '../render/tui.js';
 import { buildMatcher } from '../args.js';

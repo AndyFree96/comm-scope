@@ -1,5 +1,5 @@
-import { Matcher, hexToBuffer } from '@comm-scope/core';
-import type { Direction } from '@comm-scope/core';
+import { Matcher, hexToBuffer } from '@anthonyfree96/core';
+import type { Direction } from '@anthonyfree96/core';
 
 /** Filter flags shared by `monitor` and `search`. */
 export interface FilterFlags {

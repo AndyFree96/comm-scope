@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import type { Command } from 'commander';
-import { listSerialPorts } from '@comm-scope/core';
+import { listSerialPorts } from '@anthonyfree96/core';
 
 export function registerListSerial(program: Command): void {
   program

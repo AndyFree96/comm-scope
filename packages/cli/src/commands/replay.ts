@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import type { Command } from 'commander';
-import { parseSpec, createTransport, replayFileToTransport } from '@comm-scope/core';
-import type { Direction } from '@comm-scope/core';
+import { parseSpec, createTransport, replayFileToTransport } from '@anthonyfree96/core';
+import type { Direction } from '@anthonyfree96/core';
 import { flushStdio } from '../stdio.js';
 
 export function registerReplay(program: Command): void {
